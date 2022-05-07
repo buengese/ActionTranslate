@@ -1,0 +1,7 @@
+name: ActionTranslate
+internal_name: ActionTranslate
+author: buengese
+load_priority: 1
+description: |-
+  Force Action names to display in English no matter the current client language.
+repo_url: https://github.com/buengese/ActionTranslate
