@@ -32,8 +32,6 @@ public class ActionTranslate : IDalamudPlugin
         var getResourceSync = Service.sigScanner.ScanText("E8 ?? ?? 00 00 48 8D 8F ?? ?? 00 00 48 89 87 ?? ?? 00 00");
         _getResourceAsyncHook = new Hook<GetResourceAsyncPrototype>(getResourceAsync, GetResourceAsyncDetour);
         _getResourceSyncHook = new Hook<GetResourceSyncPrototype>(getResourceSync, GetResourceSyncDetour);
-        _getResourceAsyncHook.Enable();
-        _getResourceSyncHook.Enable();
     }
     
     private IntPtr GetResourceSyncDetour(IntPtr a1, IntPtr a2, IntPtr a3, IntPtr a4, IntPtr pPath, IntPtr a6)
@@ -63,6 +61,9 @@ public class ActionTranslate : IDalamudPlugin
 
     private void OnCommand(string command, string rawArgs)
     {
+        PluginLog.Information("Enabling GetResource Hooks");
+        _getResourceAsyncHook?.Enable();
+        _getResourceSyncHook?.Enable();
         PluginLog.Information("Attempting to reload Action Sheet");
         unsafe
         {
@@ -70,12 +71,13 @@ public class ActionTranslate : IDalamudPlugin
             framework->ExdModule->ExcelModule->LoadSheet("Action");
         }
         PluginLog.Information("Successfully reloaded Action Sheet");
+        _getResourceAsyncHook?.Disable();
+        _getResourceSyncHook?.Disable();
+        PluginLog.Information("Disabled GetResource Hooks");
     }
 
     public void Dispose()
     {
-        _getResourceSyncHook?.Disable();
-        _getResourceSyncHook?.Dispose();
         _getResourceAsyncHook?.Disable();
         _getResourceAsyncHook?.Dispose();
         Service.CommandManager.RemoveHandler(CommandName);
